@@ -36,7 +36,22 @@ services:
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: http://localhost:8000
-      REACT_APP_KEYCLOAK_URL: http://localhost:8080
+      REACT_APP_API_URL: http://backend:8000
+      REACT_APP_KEYCLOAK_URL: http://keycloak:8080
       REACT_APP_KEYCLOAK_REALM: reports-realm
       REACT_APP_KEYCLOAK_CLIENT_ID: reports-frontend
+  backend:
+    build:
+      context: ./API
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      KEYCLOAK_SERVER_URL: http://keycloak:8080
+      KEYCLOAK_REALM: reports-realm
+      KEYCLOAK_CLIENT_ID: reports-api
+      KEYCLOAK_ALLOWED_ROLE: prothetic_user
+    restart: always
+    command: fastapi dev --host 0.0.0.0 --port 8000 --reload src/main.py
+    depends_on:
+      - keycloak
